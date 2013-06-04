@@ -17,7 +17,7 @@ class wrapper:
 
     def __init__(self, address, api, username=None, password=None, useSSL=False, useJson=True, dev=False):
         if 'http' in address:
-            address = address[7:]
+            address = address.split("://")[1]
 
         self.url = address
         self.api = api
