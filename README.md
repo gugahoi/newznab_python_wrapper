@@ -1,5 +1,4 @@
 #Newznab Python Wrapper
-======================
 
 * **Author**: [Gustavo Hoirisch](https://github.com/gugahoi)
 
