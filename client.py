@@ -93,8 +93,9 @@ class wrapper:
     def groups(self):
         return self.caps()['groups']
 
-    def search(self, term, group=None, limit=None, cat=None, attrs=None, extended=None, maxage=None, offset=None, delete=None):
+    def search(self, **extras):
         """
+        q=xxx       Search input (URL/UTF-8 encoded). Case insensitive.
         group=xxxx  List of usenet groups to search delimited by ”,”
         limit=123   Upper limit for the number of items to be returned.
         cat=xxx     List of categories to search delimited by ”,”
@@ -104,30 +105,147 @@ class wrapper:
         maxage=123  Only return results which were posted to usenet in the last x days.
         offset=50   The 0 based query offset defining which part of the response we want.
         """
-        params = {'q': term}
-        if limit:
-            params['limit'] = limit
+        params = {}
+        for key, value in extras.iteritems():
+            params[key] = value
 
-        if maxage:
-            params['maxage'] = maxage
+        return self.query(self.build_url('search', params))
 
-        if offset:
-            params['offset'] = offset
+    def tv(self, **extras):
+        """
+        q=xxx       Search input (URL/UTF-8 encoded). Case insensitive.
+        season=xxx  Season string, e.g S13 or 13 for the item being queried.
+        ep=xxx      Episode string, e.g E13 or 13 for the item being queried.
+        cat=xxx     List of categories to search delimited by ”,”
+        rid=xxx     TVRage id of the item being queried.
+        limit=123   Upper limit for the number of items to be returned, e.g. 123.
+        attrs=xxx   List of requested extended attributes delimeted by ”,”
+        extended=1  List all extended attributes (attrs ignored)
+        del=1       Delete the item from a users cart on download.
+        maxage=123  Only return results which were posted to usenet in the last x days.
+        offset=50   The 0 based query offset defining which part of the response we want.
+        """
+        params = {}
+        for key, value in extras.iteritems():
+            params[key] = value
+            print '%s = %s' % (key, value)
 
+        return self.query(self.build_url('tvsearch', params))
+
+    def movie(self, **extras):
+        """
+        q=xxx       Search input (URL/UTF-8 encoded). Case insensitive.
+        imdbid=xxxx IMDB id of the item being queried e.g. 0058935.
+        genre=xxx   A genre string i.e. ‘Romance’ would match ‘(Comedy, Drama, Indie, Romance)’
+        cat=xxx     List of categories to search delimited by ”,”
+        limit=123   Upper limit for the number of items to be returned, e.g. 123.
+        attrs=xxx   List of requested extended attributes delimeted by ”,”
+        extended=1  List all extended attributes (attrs ignored)
+        del=1       Delete the item from a users cart on download.
+        maxage=123  Only return results which were posted to usenet in the last x days.
+        offset=50   The 0 based query offset defining which part of the response we want.
+        """
+        params = {}
+        for key, value in extras.iteritems():
+            params[key] = value
+            print '%s = %s' % (key, value)
+
+        return self.query(self.build_url('movie', params))
+
+    def music(self, **extras):
+        """
+        album=xxxx  Album title (URL/UTF-8 encoded). Case insensitive.
+        artist=xxxx Artist name (URL/UTF-8 encoded). Case insensitive.
+        label=xxxx  Publisher/Label name (URL/UTF-8 encoded). Case insensitive.
+        track=xxxx  Track name (URL/UTF-8 encoded). Case insensitive.
+        year=xxxx   Four digit year of release.
+        genre=xxx   A genre string i.e. ‘Romance’ would match ‘(Comedy, Drama, Indie, Romance)’
+        cat=xxx     List of categories to search delimited by ”,”
+        limit=123   Upper limit for the number of items to be returned, e.g. 123.
+        attrs=xxx   List of requested extended attributes delimeted by ”,”
+        extended=1  List all extended attributes (attrs ignored)
+        del=1       Delete the item from a users cart on download.
+        maxage=123  Only return results which were posted to usenet in the last x days.
+        offset=50   The 0 based query offset defining which part of the response we want.
+        """
+        params = {}
+        for key, value in extras.iteritems():
+            params[key] = value
+            print '%s = %s' % (key, value)
+
+        return self.query(self.build_url('music', params))
+
+    def book(self, **extras):
+        """
+        title=xxxx  Book title (URL/UTF-8 encoded). Case insensitive.
+        author=xxxx Author name (URL/UTF-8 encoded). Case insensitive.
+        limit=123   Upper limit for the number of items to be returned, e.g. 123.
+        attrs=xxx   List of requested extended attributes delimeted by ”,”
+        extended=1  List all extended attributes (attrs ignored)
+        del=1       Delete the item from a users cart on download.
+        maxage=123  Only return results which were posted to usenet in the last x days.
+        offset=50   The 0 based query offset defining which part of the response we want.
+        """
+        params = {}
+        for key, value in extras.iteritems():
+            params[key] = value
+            print '%s = %s' % (key, value)
+
+        return self.query(self.build_url('book', params))
+
+    def details(self, id):
+        """id=xxxx  The GUID of the item being queried."""
+        return self.query(self.build_url('book', {"guid": id}))
+
+    def getnfo(self, id, raw=False):
+        """
+        id=xxxx The GUID of the item being queried.
+        raw=1   If provided returns just the nfo file without the rss container
+        """
+        params = {"guid": id}
+        if raw:
+            params['raw'] = "1"
+
+        return self.query(self.build_url('getnfo', params))
+
+    def getnzb(self, id, delete=False):
+        """
+        id=xxxx The GUID of the item being queried.
+        del=1   If provided removes the nzb from the users cart (if present)
+        """
+        params = {"guid": id}
         if delete:
-            params['del'] = delete
+            params['del'] = "1"
 
-        if extended:
-            params['extended'] = extended
+        return self.query(self.build_url('get', params))
 
-        if group:
-            params['group'] = group
+    def addToCart(self, id):
+        """
+        id=xxxx The GUID of the item being queried.
+        """
+        return self.query(self.build_url('cartadd', {"guid": id}))
 
-        if cat:
-            params['cat'] = cat
+    def delFromCart(self, id):
+        """
+        id=xxxx The GUID of the item being queried.
+        """
+        return self.query(self.build_url('cartdel', {"guid": id}))
 
-        if attrs:
-            params['attrs'] = attrs
+    def comments(self, id):
+        """
+        id=xxxx The GUID of the item being queried.
+        """
+        return self.query(self.build_url('comments', {"guid": id}))
 
-        url = self.build_url('search', params)
-        return self.query(url)
+    def addComment(self, id, text):
+        """
+        id=xxxx The GUID of the item being queried.
+        text=xxxx   The comment being added (URL/UTF-8 encoded).
+        """
+        return self.query(self.build_url('commentadd', {"guid": id, "text": text}))
+
+    def user(self, username):
+        """
+        username=xxx    A valid username (URL/UTF-8 encoded).
+        """
+        return self.query(self.build_url('user', {"username": username}))
