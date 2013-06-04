@@ -63,7 +63,9 @@ class wrapper:
     def query(self, url):
         result = '{}'
         try:
-            result = urllib2.urlopen(url).read()
+            hdr = {'User-Agent': 'Mozilla/5.0'}
+            r = urllib2.Request(url, headers=hdr)
+            result = urllib2.urlopen(r).read()
         except Exception, e:
             raise e
 
